@@ -45,6 +45,13 @@ class AnimeListViewModel(
             currentPage++
         }
     }
+
+    fun refreshAnimeList() {
+        currentPage = 1
+        _animeList.value = emptyList()
+        loadNextPage()
+    }
+
 }
 
 

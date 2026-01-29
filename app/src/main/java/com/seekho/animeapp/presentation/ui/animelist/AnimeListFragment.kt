@@ -46,10 +46,7 @@ class AnimeListFragment : Fragment() {
 
         adapter = AnimeAdapter { anime ->
             val bundle = bundleOf("animeId" to anime.id)
-            findNavController().navigate(
-                R.id.animeDetailFragment,
-                bundle
-            )
+            findNavController().navigate(R.id.animeDetailFragment, bundle)
         }
 
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -57,8 +54,14 @@ class AnimeListFragment : Fragment() {
 
         observeData()
         setupPagination()
-
+        setupPullToRefresh()
         viewModel.loadNextPage()
+    }
+
+    private fun setupPullToRefresh() {
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.refreshAnimeList()
+        }
     }
 
     private fun observeData() {
@@ -66,10 +69,12 @@ class AnimeListFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.animeList.collect { list ->
-                        adapter.submitData(list)
+                        adapter.submitList(list)
+                        if (binding.swipeRefresh.isRefreshing) {
+                            binding.swipeRefresh.isRefreshing = false
+                        }
                     }
                 }
-
                 launch {
                     viewModel.isLoading.collect { loading ->
                         binding.progressBar.visibility =

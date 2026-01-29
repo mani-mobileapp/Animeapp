@@ -2,25 +2,17 @@ package com.seekho.animeapp.presentation.ui.animelist
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.seekho.animeapp.R
 import com.seekho.animeapp.databinding.ItemAnimeBinding
 import com.seekho.animeapp.domain.model.Anime
 
-
 class AnimeAdapter(
     private val onClick: (Anime) -> Unit
-) : RecyclerView.Adapter<AnimeAdapter.ViewHolder>() {
-
-    private val list = mutableListOf<Anime>()
-
-    fun submitData(newList: List<Anime>) {
-        list.clear()
-        list.addAll(newList)
-        notifyDataSetChanged()
-    }
+) : ListAdapter<Anime, AnimeAdapter.ViewHolder>(AnimeDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemAnimeBinding.inflate(
@@ -32,10 +24,8 @@ class AnimeAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(list[position])
+        holder.bind(getItem(position))
     }
-
-    override fun getItemCount() = list.size
 
     inner class ViewHolder(private val binding: ItemAnimeBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -51,11 +41,21 @@ class AnimeAdapter(
                 .error(R.drawable.ic_error)
                 .into(binding.imgPoster)
 
-
             binding.root.setOnClickListener { onClick(anime) }
         }
     }
 }
+
+class AnimeDiffCallback : DiffUtil.ItemCallback<Anime>() {
+    override fun areItemsTheSame(oldItem: Anime, newItem: Anime): Boolean {
+        return oldItem.id == newItem.id
+    }
+
+    override fun areContentsTheSame(oldItem: Anime, newItem: Anime): Boolean {
+        return oldItem == newItem
+    }
+}
+
 
 
 

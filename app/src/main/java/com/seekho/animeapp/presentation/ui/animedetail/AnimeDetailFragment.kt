@@ -25,9 +25,7 @@ class AnimeDetailFragment : Fragment() {
     private lateinit var viewModel: AnimeDetailViewModel
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAnimeDetailBinding.inflate(inflater, container, false)
         return binding.root
@@ -38,8 +36,7 @@ class AnimeDetailFragment : Fragment() {
         val app = requireActivity().application as AnimeApplication
 
         viewModel = ViewModelProvider(
-            this,
-            AnimeViewModelFactory(app.container.repository)
+            this, AnimeViewModelFactory(app.container.repository)
         )[AnimeDetailViewModel::class.java]
 
         val animeId = requireArguments().getInt("animeId")
@@ -84,18 +81,17 @@ class AnimeDetailFragment : Fragment() {
         binding.textSynopsis.text = anime.synopsis
         binding.textEpisodes.text = getString(R.string.episodes, anime.episodes)
         binding.textRating.text = getString(R.string.rating, anime.rating)
-        Glide.with(binding.root)
-            .load(anime.posterUrl)
-            .placeholder(R.drawable.ic_placeholder)
-            .error(R.drawable.ic_error)
-            .into(binding.poster)
 
         if (!anime.trailerUrl.isNullOrEmpty()) {
             binding.webView.settings.javaScriptEnabled = true
             binding.webView.loadUrl(anime.trailerUrl)
-            binding.webView.visibility = View.VISIBLE
+            binding.webViewCardView.visibility = View.VISIBLE
+            binding.posterCardView.visibility = View.GONE
         } else {
-            binding.webView.visibility = View.GONE
+            binding.webViewCardView.visibility = View.GONE
+            binding.posterCardView.visibility = View.VISIBLE
+            Glide.with(binding.root).load(anime.posterUrl).placeholder(R.drawable.ic_placeholder)
+                .error(R.drawable.ic_error).into(binding.poster)
         }
     }
 
