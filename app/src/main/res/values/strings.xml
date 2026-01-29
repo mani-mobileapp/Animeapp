@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Animeapp</string>
+    <string name="episodes">Episodes: %1$d</string>
+    <string name="rating">Rating: %1$s</string>
 </resources>
