@@ -18,36 +18,34 @@ class AnimeListViewModel(
     private val _animeList = MutableStateFlow<List<Anime>>(emptyList())
     val animeList: StateFlow<List<Anime>> = _animeList
 
-    private val _errorEvent = MutableSharedFlow<String>()
-    val errorEvent = _errorEvent
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _isPaginating = MutableStateFlow(false)
+    val isPaginating: StateFlow<Boolean> = _isPaginating
 
     private var currentPage = 1
-    private var isLoading = false
+    private var isLastPage = false
 
     fun loadNextPage() {
-        if (isLoading) return
-        isLoading = true
+        if (_isLoading.value || _isPaginating.value || isLastPage) return
 
         viewModelScope.launch {
-            when (val result = repository.getTopAnime(currentPage)) {
+            if (currentPage == 1) _isLoading.value = true
+            else _isPaginating.value = true
 
-                is NetworkResult.Success -> {
-                    _animeList.value = _animeList.value + result.data
-                    currentPage++
-                }
-
-                is NetworkResult.Error -> {
-                    _errorEvent.emit(
-                        result.message ?: "Failed to load anime list"
-                    )
-                }
-
-                is NetworkResult.Loading -> {
-                }
+            val result = repository.getTopAnime(currentPage)
+            if (result is NetworkResult.Success) {
+                if (result.data.isEmpty()) isLastPage = true
+                _animeList.value = _animeList.value + result.data
             }
-            isLoading = false
+
+            _isLoading.value = false
+            _isPaginating.value = false
+            currentPage++
         }
     }
 }
+
 
 

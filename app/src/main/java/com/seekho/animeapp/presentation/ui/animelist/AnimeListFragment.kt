@@ -64,8 +64,24 @@ class AnimeListFragment : Fragment() {
     private fun observeData() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.animeList.collect { list ->
-                    adapter.submitData(list)
+                launch {
+                    viewModel.animeList.collect { list ->
+                        adapter.submitData(list)
+                    }
+                }
+
+                launch {
+                    viewModel.isLoading.collect { loading ->
+                        binding.progressBar.visibility =
+                            if (loading && adapter.itemCount == 0) View.VISIBLE else View.GONE
+                    }
+                }
+
+                launch {
+                    viewModel.isPaginating.collect { paginating ->
+                        binding.bottomProgressBar.visibility =
+                            if (paginating) View.VISIBLE else View.GONE
+                    }
                 }
             }
         }

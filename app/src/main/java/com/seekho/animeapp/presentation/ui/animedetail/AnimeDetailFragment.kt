@@ -70,7 +70,7 @@ class AnimeDetailFragment : Fragment() {
                         binding.progressBar.visibility = View.GONE
                         binding.contentLayout.visibility = View.GONE
                         binding.errorText.visibility = View.VISIBLE
-                        binding.errorText.text = result.message
+                        binding.errorText.text = "Failed to load details"
                     }
                 }
             }
@@ -84,18 +84,18 @@ class AnimeDetailFragment : Fragment() {
         binding.textSynopsis.text = anime.synopsis
         binding.textEpisodes.text = getString(R.string.episodes, anime.episodes)
         binding.textRating.text = getString(R.string.rating, anime.rating)
+        Glide.with(binding.root)
+            .load(anime.posterUrl)
+            .placeholder(R.drawable.ic_placeholder)
+            .error(R.drawable.ic_error)
+            .into(binding.poster)
 
         if (!anime.trailerUrl.isNullOrEmpty()) {
             binding.webView.settings.javaScriptEnabled = true
             binding.webView.loadUrl(anime.trailerUrl)
             binding.webView.visibility = View.VISIBLE
-            binding.poster.visibility = View.GONE
         } else {
             binding.webView.visibility = View.GONE
-            binding.poster.visibility = View.VISIBLE
-            Glide.with(this)
-                .load(anime.posterUrl)
-                .into(binding.poster)
         }
     }
 

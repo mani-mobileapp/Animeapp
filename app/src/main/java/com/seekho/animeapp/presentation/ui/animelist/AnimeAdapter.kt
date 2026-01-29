@@ -1,14 +1,14 @@
 package com.seekho.animeapp.presentation.ui.animelist
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
+
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.seekho.animeapp.R
+import com.seekho.animeapp.databinding.ItemAnimeBinding
 import com.seekho.animeapp.domain.model.Anime
+
 
 class AnimeAdapter(
     private val onClick: (Anime) -> Unit
@@ -23,9 +23,12 @@ class AnimeAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_anime, parent, false)
-        return ViewHolder(view)
+        val binding = ItemAnimeBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -34,19 +37,25 @@ class AnimeAdapter(
 
     override fun getItemCount() = list.size
 
-    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val title = view.findViewById<TextView>(R.id.txtTitle)
-        private val poster = view.findViewById<ImageView>(R.id.imgPoster)
+    inner class ViewHolder(private val binding: ItemAnimeBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
         fun bind(anime: Anime) {
-            title.text = anime.title
-            Glide.with(itemView)
-                .load(anime.posterUrl)
-                .into(poster)
+            binding.txtTitle.text = anime.title
+            binding.txtEpisodes.text = "Episodes: ${anime.episodes}"
+            binding.txtRating.text = "Rating: ${anime.rating}"
 
-            itemView.setOnClickListener { onClick(anime) }
+            Glide.with(binding.root)
+                .load(anime.posterUrl)
+                .placeholder(R.drawable.ic_placeholder)
+                .error(R.drawable.ic_error)
+                .into(binding.imgPoster)
+
+
+            binding.root.setOnClickListener { onClick(anime) }
         }
     }
 }
+
 
 
